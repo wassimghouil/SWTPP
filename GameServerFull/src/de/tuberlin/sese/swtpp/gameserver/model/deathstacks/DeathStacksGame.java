@@ -2,6 +2,7 @@ package de.tuberlin.sese.swtpp.gameserver.model.deathstacks;
 
 import de.tuberlin.sese.swtpp.gameserver.model.Game;
 import de.tuberlin.sese.swtpp.gameserver.model.Player;
+import de.tuberlin.sese.swtpp.gameserver.model.Position;
 // TODO: more imports allowed
 
 public class DeathStacksGame extends Game {
@@ -20,6 +21,10 @@ public class DeathStacksGame extends Game {
 	private Player redPlayer;
 
 	// TODO: internal representation of the game state 
+	/**
+	 * represent the current position of the pieces
+	 */
+	private String currentBoard = "";
 	
 	/************************
 	 * constructors
@@ -191,20 +196,54 @@ public class DeathStacksGame extends Game {
 	/*******************************************
 	 * !!!!!!!!! To be implemented !!!!!!!!!!!!
 	 ******************************************/
-	
+	private void setStapel(String pos) {
+		Position p = new Position(pos);
+		String reihe = getBoard().split("/")[p.getY()];
+		//this.currentBoard = Arrays.as
+		//TODO not complete
+		
+	}
+	/**
+	 * @param Position dieser stapel
+	 * @return a string that represent a Stapel
+	 */
+	private String getStapel(String pos) {
+		Position position = new Position(pos);
+		String reihe = getBoard().split("/")[position.getY()];
+		return reihe.split(",")[position.getX()];
+	}
 	@Override
 	public void setBoard(String state) {
-		// TODO: implement
+		this.currentBoard = state;
 	}
 	
 	@Override
 	public String getBoard() {
-		// TODO: replace with implementation
-		return "rr,rr,rr,rr,rr,rr/,,,,,/,,,,,/,,,,,/,,,,,/bb,bb,bb,bb,bb,bb";
+		return this.currentBoard;
+		//return "rr,rr,rr,rr,rr,rr/,,,,,/,,,,,/,,,,,/,,,,,/bb,bb,bb,bb,bb,bb";
 	}
 	
 	@Override
 	public boolean tryMove(String moveString, Player player) {
+		String[] move = moveString.split("-");
+		String currentStack = getStapel(move[0]);
+		if(getStatus().equals("Started")) {
+			if(currentStack.charAt(0)==nextPlayerString().charAt(0)) { 
+				//falls die Obere stück zum spieler gehört
+					if(Integer.parseInt(move[1]) <= currentStack.length()) {
+						//(anzahl der Schritte<=anzahl der figuren)?
+						if(!(currentStack.length() > 4 && Integer.parseInt(move[1])>=(currentStack.length()-4))) {
+						//too Tall Regel
+						//TODO kein bewegung im rand richtung wenn stapel schon am rand steht
+						
+					}	
+				}
+			}
+		}
+		
+		
+		
+		
 		// TODO: replace with implementation 
 		return false;
 	}
