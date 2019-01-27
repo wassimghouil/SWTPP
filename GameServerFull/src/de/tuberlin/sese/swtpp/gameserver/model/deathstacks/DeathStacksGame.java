@@ -212,6 +212,7 @@ public class DeathStacksGame extends Game {
 		String reihe = getBoard().split("/")[position.getY()];
 		return reihe.split(",")[position.getX()];
 	}
+
 	@Override
 	public void setBoard(String state) {
 		this.currentBoard = state;
@@ -225,11 +226,15 @@ public class DeathStacksGame extends Game {
 	
 	@Override
 	public boolean tryMove(String moveString, Player player) {
+		if(!verifyMove(moveString) || checkStapels(moveString) == null) {
+			return false;
+		}
+
 		String[] move = moveString.split("-");
 		String currentStack = getStapel(move[0]);
 		if(getStatus().equals("Started")) {
 			if(currentStack.charAt(0)==nextPlayerString().charAt(0)) { 
-				//falls die Obere stück zum spieler gehört
+				//falls die Obere stï¿½ck zum spieler gehï¿½rt
 					if(Integer.parseInt(move[1]) <= currentStack.length()) {
 						//(anzahl der Schritte<=anzahl der figuren)?
 						if(!(currentStack.length() > 4 && Integer.parseInt(move[1])>=(currentStack.length()-4))) {
@@ -241,11 +246,44 @@ public class DeathStacksGame extends Game {
 			}
 		}
 		
-		
-		
-		
-		// TODO: replace with implementation 
-		return false;
+
+
+		return true;
 	}
-		
+
+	// Checks if moveString format is valid
+	private boolean verifyMove(String moveString) {
+		String re = "[a-f][1-6]-+\\d-[a-f][1-6]";
+		if(!moveString.matches(re)) {
+			return false;
+		}
+		/*
+		String[] move = moveString.split("-");
+		String stapel = this.getStapel(move[0]);
+		*/
+
+
+		return true;
+	}
+
+	// Searches for a stapel.length > 4 for the current player
+	// TODO: check if stapel.position == moveString.position
+	// TODO: check if moveString moves enough stones so is stapel.length < 5
+	private Stapel checkStapels(String moveString) {
+		String[] reihen = getBoard().split("/");
+		for (int i = 0; i < reihen.length - 1; i++) {
+			String[] felder = reihen[i].split(",");
+			for (int j = 0; j < felder.length - 1; i++) {
+				if (felder[j].length() < 5) {
+					continue;
+				}
+				if (felder[j].startsWith(nextPlayerString())) {
+					return new Stapel(felder[j], new Position(j, i));
+				}
+
+			}
+		}
+
+		return null;
+	};
 }
