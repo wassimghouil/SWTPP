@@ -32,7 +32,7 @@ public class DeathStacksGame extends Game {
 	
 	public DeathStacksGame() throws Exception{
 		super();
-		
+		this.currentBoard = "rr,rr,rr,rr,rr,rr/,,,,,/,,,,,/,,,,,/,,,,,/bb,bb,bb,bb,bb,bb";
 		// TODO: Initialization, if necessary
 	}
 	
@@ -219,12 +219,13 @@ public class DeathStacksGame extends Game {
 	
 	@Override
 	public String getBoard() {
-		return this.currentBoard;
-		//return "rr,rr,rr,rr,rr,rr/,,,,,/,,,,,/,,,,,/,,,,,/bb,bb,bb,bb,bb,bb";
+		//return this.currentBoard;
+		return "rr,rr,rr,rr,rr,rr/,,,,,/,,,,,/,,,,,/,,,,,/bb,bb,bb,bb,bb,bb";
 	}
 	
 	@Override
 	public boolean tryMove(String moveString, Player player) {
+		System.out.println("hello");
 		String[] move = moveString.split("-");
 		String currentStack = getStapel(move[0]);
 		if(getStatus().equals("Started")) {
