@@ -24,14 +24,14 @@ public class DeathStacksGame extends Game {
 	/**
 	 * represent the current position of the pieces
 	 */
-	private String currentBoard = "";
+	String currentBoard = "" ;
 	
 	/************************
 	 * constructors
 	 ***********************/
 	
 	public DeathStacksGame() throws Exception{
-		super();
+		System.out.println(this.currentBoard);
 		this.currentBoard = "rr,rr,rr,rr,rr,rr/,,,,,/,,,,,/,,,,,/,,,,,/bb,bb,bb,bb,bb,bb";
 		// TODO: Initialization, if necessary
 	}
@@ -221,31 +221,28 @@ public class DeathStacksGame extends Game {
 	@Override
 	public String getBoard() {
 		//return this.currentBoard;
-		return "rr,rr,rr,rr,rr,rr/,,,,,/,,,,,/,,,,,/,,,,,/bb,bb,bb,bb,bb,bb";
+		System.out.println(this.currentBoard);
+		return this.currentBoard;
 	}
 	
 	@Override
 	public boolean tryMove(String moveString, Player player) {
-<<<<<<< HEAD
-		System.out.println("hello");
-=======
-		if(!verifyMove(moveString) || checkStapels(moveString) == null) {
+		if(!verifyMove(moveString)) {
 			return false;
-		}
-
->>>>>>> refs/remotes/origin/master
+			}
 		String[] move = moveString.split("-");
 		String currentStack = getStapel(move[0]);
 		if(getStatus().equals("Started")) {
 			if(currentStack.charAt(0)==nextPlayerString().charAt(0)) { 
-				//falls die Obere st�ck zum spieler geh�rt
+				//falls die Obere stueck zum spieler gehoert
 					if(Integer.parseInt(move[1]) <= currentStack.length()) {
+						System.out.println("Move Checked");
 						//(anzahl der Schritte<=anzahl der figuren)?
-						if(!(currentStack.length() > 4 && Integer.parseInt(move[1])>=(currentStack.length()-4))) {
+						//if(!(currentStack.length() > 4 && Integer.parseInt(move[1])>=(currentStack.length()-4))) {
 						//too Tall Regel
 						//TODO kein bewegung im rand richtung wenn stapel schon am rand steht
 						
-					}	
+					//}	
 				}
 			}
 		}
@@ -282,7 +279,7 @@ public class DeathStacksGame extends Game {
 					continue;
 				}
 				if (felder[j].startsWith(nextPlayerString())) {
-					return new Stapel(felder[j], new Position(j, i));
+					return new Stapel(felder[j], new Position(j, i).toString());
 				}
 
 			}
