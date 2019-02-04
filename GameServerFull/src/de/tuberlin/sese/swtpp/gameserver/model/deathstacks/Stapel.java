@@ -2,12 +2,7 @@
  * 
  */
 package de.tuberlin.sese.swtpp.gameserver.model.deathstacks;
-
-import java.util.Arrays;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Stack;
-import java.util.stream.Collectors;
+import java.io.Serializable;
 
 import de.tuberlin.sese.swtpp.gameserver.model.Position;
 
@@ -15,13 +10,13 @@ import de.tuberlin.sese.swtpp.gameserver.model.Position;
  * @author Ouassim
  *
  */
-public class Stapel {
+public class Stapel implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	/*********************************************************************
 	 **the string that represent a stack with his position on the board
 	***********************************************************************/
-	private List<Character> data;
+	private String data;
 	private Position position;
 
 	/**********************************************************************
@@ -29,66 +24,66 @@ public class Stapel {
 	 * @param data
 	 * @param position
 	 *********************************************************************/
-	public Stapel(LinkedList<Character> data, Position position) {
+	public Stapel(String data, Position position) {
 		this.data = data;
 		this.position = position;
 	}
-	public Stapel(String data,Position position) {
-		this(data.chars()
-				.mapToObj(i->(char)i)
-				.collect(Collectors.toCollection(LinkedList::new)),position);
-	}
+
 	public Stapel(String data , String pos) {
-		this(data.chars()
-				.mapToObj(i->(char)i)
-				.collect(Collectors.toCollection(LinkedList::new)), new Position(pos));
+		this(data, new Position(pos));
 		
 	}
+	public Stapel(Position pos) {
+		this(null,pos);
+	}
 
-	
 	/**********
 	 * GETTERS
 	 **********/
-	public List GetData() {
-		return this.data;
-	}
 
 	public Position GetPosition() {
 		return this.position;
 	}
-	
+	public char getOwner() {
+		if(this.data == null || this.data.length() == 0)
+		return 'n' ;
+		return this.data.charAt(0);
+	}
+	public int getNumbofPieces() {
+		return this.data.length();
+	}
+	/**********
+	 * TOSTRING
+	 **********/
 	@Override
 	public String toString() {
-		if(data == null)
-		return "null";
-		return data.stream()
-				.map(Object::toString)
-				.collect(Collectors.joining());
+		return this.data;
 	}
-	/**
-	 * @param stapel
+	/**this method pushes pieces into stack
+	 * @param stapel is a string representation of the given stack
 	 */
-	public String addStapel(String stapel) {
-		if(stapel == null)
-			return null ;
-		if(data == null) 
-		this.data = new Stapel(stapel,"a0").data;
-		else
-		this.data.addAll(0,new Stapel(stapel,"a0").data);
-		return this.toString();
-	}
-	/**
-	 * @param x
-	 */
-	public String removePieces(int x) {
-		if(x >= this.data.size()) {
-			this.data = null;
-			return null;
+	public void addPieces(String stapel) { 
+		if (this.data == null || this.data.isEmpty()) {
+		this.data = stapel  ;
 		}
-		else 
-			this.data = this.data.subList(x,data.size());
-		return this.toString();
+		else {
+		this.data = stapel + this.data ;	
+		}
+	}
+	/**this method pops a x number of pieces from this stack
+	 * @param x : how many pieces you want to take?
+	 * @return the string representation of popped pieces
+	 */
+	public String takePieces(int x) {
+		if(x>this.data.length()) {
+			throw new IllegalArgumentException("not enought pieces");
+		}
+		String removed = this.data.substring(0,x);
+		this.data = this.data.substring(x);
+		System.out.println("Remove piece are "+ removed);
+		return removed  ;
+		}
 		
 	}
 	
-}
+

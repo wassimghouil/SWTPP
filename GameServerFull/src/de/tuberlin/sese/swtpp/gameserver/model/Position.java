@@ -3,12 +3,18 @@
  */
 package de.tuberlin.sese.swtpp.gameserver.model;
 
+import java.io.Serializable;
+
 /**
  * @author Ouassim
  *
  */
-public class Position {
+public class Position implements Serializable {
 	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	private int x;
 	private int y;
 	

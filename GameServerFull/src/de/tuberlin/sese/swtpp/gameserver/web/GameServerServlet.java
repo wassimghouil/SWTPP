@@ -130,7 +130,7 @@ public class GameServerServlet extends HttpServlet {
 				    	System.out.println(move);
 				    	out.write(tryMove(u,gameID,move));
 				    }
-		    	} catch (Exception e) { System.out.println("Illegal Input: " + request.toString());}			    				     
+		    	} catch (Exception e) { System.out.println("Illegal Input: " + request.toString());e.printStackTrace();}			    				     
 		    }
 			// might be smarter to save only if there was a change
 			// and also bot moves are not saved....

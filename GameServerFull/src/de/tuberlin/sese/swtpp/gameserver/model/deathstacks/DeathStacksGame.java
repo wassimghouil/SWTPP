@@ -24,15 +24,16 @@ public class DeathStacksGame extends Game {
 	/**
 	 * represent the current position of the pieces
 	 */
-	String currentBoard = "" ;
+	private final Board board = new Board() ;
+	private String currentpositions = "" ;
 	
 	/************************
 	 * constructors
 	 ***********************/
 	
 	public DeathStacksGame() throws Exception{
-		System.out.println(this.currentBoard);
-		this.currentBoard = "rr,rr,rr,rr,rr,rr/,,,,,/,,,,,/,,,,,/,,,,,/bb,bb,bb,bb,bb,bb";
+	 super();
+		this.currentpositions = this.board.toString();
 		// TODO: Initialization, if necessary
 	}
 	
@@ -196,60 +197,49 @@ public class DeathStacksGame extends Game {
 	/*******************************************
 	 * !!!!!!!!! To be implemented !!!!!!!!!!!!
 	 ******************************************/
-	private void setStapel(String pos) {
-		Position p = new Position(pos);
-		String reihe = getBoard().split("/")[p.getY()];
-		//this.currentBoard = Arrays.as
-		//TODO not complete
-		
-	}
-	/**
-	 * @param Position dieser stapel
-	 * @return a string that represent a Stapel
-	 */
-	private String getStapel(String pos) {
-		Position position = new Position(pos);
-		String reihe = getBoard().split("/")[position.getY()];
-		return reihe.split(",")[position.getX()];
-	}
 
 	@Override
 	public void setBoard(String state) {
-		this.currentBoard = state;
+		this.currentpositions = state;
 	}
 	
 	@Override
 	public String getBoard() {
-		//return this.currentBoard;
-		System.out.println(this.currentBoard);
-		return this.currentBoard;
+//		System.out.println(this.board.toString());
+//		System.out.println(this.currentpositions);
+		return this.board.toString() ;
 	}
 	
 	@Override
 	public boolean tryMove(String moveString, Player player) {
-		if(!verifyMove(moveString)) {
-			return false;
-			}
-		String[] move = moveString.split("-");
-		String currentStack = getStapel(move[0]);
-		if(getStatus().equals("Started")) {
-			if(currentStack.charAt(0)==nextPlayerString().charAt(0)) { 
-				//falls die Obere stueck zum spieler gehoert
-					if(Integer.parseInt(move[1]) <= currentStack.length()) {
-						System.out.println("Move Checked");
-						//(anzahl der Schritte<=anzahl der figuren)?
+//		String[] move = moveString.split("-");
+//		
+		//falls moveString gültig und spiel gestartet ist
+		if(verifyMove(moveString) && getStatus().equals("Started")) {
+			String[] move = moveString.split("-");
+			Stapel fromStack = board.getStapel(move[0]);
+			System.out.println("falls moveString gültig und spiel gestartet ist");
+			//falls die Obere stueck zum spieler gehoert
+			if(fromStack.toString().charAt(0)==nextPlayerString().charAt(0)) {
+				System.out.println("falls die Obere stueck zum spieler gehoert");
+				//too Tall Regel
+				if((fromStack.getNumbofPieces()>=4 && fromStack.getNumbofPieces()-Integer.parseInt(move[1])<=4)  ||!board.getTallStack(nextPlayerString().charAt(0))) {
+					System.out.println("too Tall Regel");
+						//falls nicht start und ziel im rand stehen
+						if(!(new Position(move[0]).isRand()&&(new Position(move[2]).isRand()))){
+						System.out.println("falls nicht start und ziel im rand stehen");
+						//Züg ausfuhren
+						this.board.movePieces(move[0],move[2],Integer.parseInt(move[1]));
+						setNextPlayer((isRedNext())?bluePlayer:redPlayer);
+						return true;
+						}
+					}
+				}	
+		}				//(anzahl der Schritte<=anzahl der figuren)?
 						//if(!(currentStack.length() > 4 && Integer.parseInt(move[1])>=(currentStack.length()-4))) {
-						//too Tall Regel
-						//TODO kein bewegung im rand richtung wenn stapel schon am rand steht
 						
-					//}	
-				}
-			}
-		}
-		
-
-
-		return true;
+						//TODO kein bewegung im rand richtung wenn stapel schon am rand steht
+		return false;
 	}
 
 	// Checks if moveString format is valid

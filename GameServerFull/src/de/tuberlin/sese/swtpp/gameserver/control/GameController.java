@@ -130,7 +130,7 @@ public class GameController implements Serializable{
 	 * @return true if move was allowed and performed
 	 */
 	public boolean tryMove(User u, int gameID, String move) {
-		System.out.println("hello all");
+		//System.out.println("hello all");
 		Game g = getGame(gameID);
 		
 		if (g != null) {

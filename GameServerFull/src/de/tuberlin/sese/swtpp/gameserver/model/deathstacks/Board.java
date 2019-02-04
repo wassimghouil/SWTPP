@@ -1,14 +1,24 @@
 package de.tuberlin.sese.swtpp.gameserver.model.deathstacks;
+import java.io.Serializable;
+import java.rmi.Remote;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import de.tuberlin.sese.swtpp.gameserver.model.Position;
 /**
  * @author Ouassim
  *
  */
-public class Board {
+public class Board implements Serializable {
 	
-	private final LinkedList<LinkedList<Stapel>> positions = new LinkedList<LinkedList<Stapel>>();
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+	/**
+	 * board representation
+	 */
+	private LinkedList<LinkedList<Stapel>> positions = new LinkedList<LinkedList<Stapel>>();
 	
 	/****************
 	 * Constructor
@@ -22,7 +32,7 @@ public class Board {
 			
 			if(y>0 && y<5) {
 			System.out.println("hier "+y);
-			tempRow.add(null);
+			tempRow.add(new Stapel(new Position(x,y)));
 			}
 			
 			else {
@@ -36,7 +46,7 @@ public class Board {
 	}
 	
 	/**
-	 * @return
+	 * @return board positions
 	 */
 	public LinkedList<LinkedList<Stapel>> getPositions() {
 		return positions;
@@ -44,7 +54,7 @@ public class Board {
 	
 	/**
 	 * @param position
-	 * @return
+	 * @return the 
 	 */
 	public Stapel getStapel(String position) {
 		Position temp = new Position(position);
@@ -53,23 +63,46 @@ public class Board {
 										.findAny().orElse(null);
 			}
 	/**
-	 * @param move
+	 * @param move that will be played
+	 * (the move will not be checked)
 	 */
-	public void setBoard(String move) {
-//		String[] movet = move.split("-");
-//		Stapel fromStapel = getStapel(movet[0]);
-//		Stapel toStapel	= getStapel(movet[2]);
-//		toStapel.addStapel(fromStapel.removePieces(Integer.parseInt(movet[1])));
-//		int y=0;
-//		for (LinkedList<Stapel> row : this.positions) {
-//		if(y == fromStapel.GetPosition().getY())
-//		row.set(fromStapel.GetPosition().getX(), fromStapel);
-//		if(y == toStapel.GetPosition().getY())
-//			row.set(toStapel.GetPosition().getX(), toStapel);
-//		}
-//		
-	//TODO
+	public boolean movePieces(String from,String to,int x) {
+	String movedPieces = this.getStapel(from).takePieces(x);
+	
+	Stapel toStapel = this.getStapel(to);
+	this.getStapel(to).addPieces(movedPieces);
+	return true;	
+	}
+	/** TOSTRING
+	 * @see java.lang.Object#toString()
+	 */
+	public String toString() {
+		return this.positions.stream()
+				.map(l-> l.stream().map(stapel -> (stapel == null || stapel.toString() == null)?"":stapel.toString())
+						.collect(Collectors.joining(",")))
+				.collect(Collectors.joining("/"));
+				}
+	private void createStapelAt(String input,Position pos) {
+	this.positions.get(pos.getY()).set(pos.getX(),new Stapel(input, pos));	
+	}
+	public boolean getTallStack(char player) {
+		return this.positions.stream().anyMatch(row-> row.stream().anyMatch(stack -> stack.getOwner() == player && stack.getNumbofPieces()>= 4));
 	}
 	
-
+//	public void setPositions(String position) {
+//		LinkedList<LinkedList<Stapel>> result = new LinkedList<LinkedList<Stapel>>();
+//		String[] rows = position.split("/");
+//		String[]row = null;
+//		LinkedList<Stapel> tempRow = null;
+//		
+//		for (int y = 0; y < 6; y++) {
+//			row = rows[y].split(",");
+//			tempRow = new LinkedList<Stapel>();
+//			for (int x = 0; x < 6; x++) {
+//				tempRow.add(new Stapel(row[x], new Position(x, y)));
+//				}
+//			result.add(tempRow);		
+//	}
+//		this.positions = result ;
+//}
 }
