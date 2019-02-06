@@ -2,8 +2,6 @@ package de.tuberlin.sese.swtpp.gameserver.model.deathstacks;
 
 import de.tuberlin.sese.swtpp.gameserver.model.Game;
 import de.tuberlin.sese.swtpp.gameserver.model.Player;
-import de.tuberlin.sese.swtpp.gameserver.model.Position;
-// TODO: more imports allowed
 
 public class DeathStacksGame extends Game {
 	
@@ -25,7 +23,7 @@ public class DeathStacksGame extends Game {
 	 * represent the current position of the pieces
 	 */
 	private final Board board = new Board() ;
-	private String currentpositions = "" ;
+
 	
 	/************************
 	 * constructors
@@ -33,8 +31,6 @@ public class DeathStacksGame extends Game {
 	
 	public DeathStacksGame() throws Exception{
 	 super();
-		this.currentpositions = this.board.toString();
-		// TODO: Initialization, if necessary
 	}
 	
 	public String getType() {
@@ -200,20 +196,16 @@ public class DeathStacksGame extends Game {
 
 	@Override
 	public void setBoard(String state) {
-		this.currentpositions = state;
+		//TODO
 	}
 	
 	@Override
 	public String getBoard() {
-//		System.out.println(this.board.toString());
-//		System.out.println(this.currentpositions);
 		return this.board.toString() ;
 	}
 	
 	@Override
-	public boolean tryMove(String moveString, Player player) {
-//		String[] move = moveString.split("-");
-//		
+	public boolean tryMove(String moveString, Player player) {	
 		//falls moveString gültig und spiel gestartet ist
 		if(verifyMove(moveString) && getStatus().equals("Started")) {
 			String[] move = moveString.split("-");
@@ -225,56 +217,33 @@ public class DeathStacksGame extends Game {
 				//too Tall Regel
 				if((fromStack.getNumbofPieces()>=4 && fromStack.getNumbofPieces()-Integer.parseInt(move[1])<=4)  ||!board.getTallStack(nextPlayerString().charAt(0))) {
 					System.out.println("too Tall Regel");
-						//falls nicht start und ziel im rand stehen
-						if(!(new Position(move[0]).isRand()&&(new Position(move[2]).isRand()))){
-						System.out.println("falls nicht start und ziel im rand stehen");
+					Zug zug = new Zug(Integer.parseInt(move[1]),new Position(move[0]));
+					System.out.println("destinations :");
+					zug.getPossibleDest().stream().forEach(System.out::println);
+						//falls zueg möglich
+						if(zug.getPossibleDest().contains(move[2])){
+						System.out.println("falls zueg möglich");
 						//Züg ausfuhren
 						this.board.movePieces(move[0],move[2],Integer.parseInt(move[1]));
 						setNextPlayer((isRedNext())?bluePlayer:redPlayer);
 						return true;
 						}
-					}
-				}	
-		}				//(anzahl der Schritte<=anzahl der figuren)?
-						//if(!(currentStack.length() > 4 && Integer.parseInt(move[1])>=(currentStack.length()-4))) {
-						
-						//TODO kein bewegung im rand richtung wenn stapel schon am rand steht
+				}
+			}	
+		}			
 		return false;
 	}
 
-	// Checks if moveString format is valid
+	/**checks the moveString's syntax
+	 * @param moveString
+	 * @return true if moveString sytax is correct, false otherwise
+	 */
 	private boolean verifyMove(String moveString) {
 		String re = "[a-f][1-6]-+\\d-[a-f][1-6]";
 		if(!moveString.matches(re)) {
 			return false;
 		}
-		/*
-		String[] move = moveString.split("-");
-		String stapel = this.getStapel(move[0]);
-		*/
-
-
 		return true;
 	}
 
-	// Searches for a stapel.length > 4 for the current player
-	// TODO: check if stapel.position == moveString.position
-	// TODO: check if moveString moves enough stones so is stapel.length < 5
-	private Stapel checkStapels(String moveString) {
-		String[] reihen = getBoard().split("/");
-		for (int i = 0; i < reihen.length - 1; i++) {
-			String[] felder = reihen[i].split(",");
-			for (int j = 0; j < felder.length - 1; i++) {
-				if (felder[j].length() < 5) {
-					continue;
-				}
-				if (felder[j].startsWith(nextPlayerString())) {
-					return new Stapel(felder[j], new Position(j, i).toString());
-				}
-
-			}
-		}
-
-		return null;
-	};
 }

@@ -4,8 +4,6 @@
 package de.tuberlin.sese.swtpp.gameserver.model.deathstacks;
 import java.io.Serializable;
 
-import de.tuberlin.sese.swtpp.gameserver.model.Position;
-
 /**
  * @author Ouassim
  *
@@ -73,6 +71,7 @@ public class Stapel implements Serializable {
 	/**this method pops a x number of pieces from this stack
 	 * @param x : how many pieces you want to take?
 	 * @return the string representation of popped pieces
+	 * @throws exception if x greater than stack pieces
 	 */
 	public String takePieces(int x) {
 		if(x>this.data.length()) {
