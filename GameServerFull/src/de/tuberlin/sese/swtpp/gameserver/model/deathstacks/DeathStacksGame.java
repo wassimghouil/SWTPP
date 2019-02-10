@@ -1,6 +1,11 @@
 package de.tuberlin.sese.swtpp.gameserver.model.deathstacks;
 
+import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+
 import de.tuberlin.sese.swtpp.gameserver.model.Game;
+import de.tuberlin.sese.swtpp.gameserver.model.Move;
 import de.tuberlin.sese.swtpp.gameserver.model.Player;
 
 public class DeathStacksGame extends Game {
@@ -23,6 +28,9 @@ public class DeathStacksGame extends Game {
 	 * represent the current position of the pieces
 	 */
 	private final Board board = new Board() ;
+	private String lastBoardstate = "";
+	private int counter = 0;
+	
 
 	
 	/************************
@@ -31,6 +39,7 @@ public class DeathStacksGame extends Game {
 	
 	public DeathStacksGame() throws Exception{
 	 super();
+	 this.lastBoardstate = this.board.toString();
 	}
 	
 	public String getType() {
@@ -196,7 +205,7 @@ public class DeathStacksGame extends Game {
 
 	@Override
 	public void setBoard(String state) {
-		//TODO
+		this.board.setBoard(state);
 	}
 	
 	@Override
@@ -206,34 +215,55 @@ public class DeathStacksGame extends Game {
 	
 	@Override
 	public boolean tryMove(String moveString, Player player) {	
-		//falls moveString gültig und spiel gestartet ist
-		if(verifyMove(moveString) && getStatus().equals("Started")) {
+		//moveString gültig? + spiel gestartet ist?
+		if(!(verifyMove(moveString) && getStatus().equals("Started")))
+			return false;
 			String[] move = moveString.split("-");
 			Stapel fromStack = board.getStapel(move[0]);
-			System.out.println("falls moveString gültig und spiel gestartet ist");
-			//falls die Obere stueck zum spieler gehoert
-			if(fromStack.toString().charAt(0)==nextPlayerString().charAt(0)) {
-				System.out.println("falls die Obere stueck zum spieler gehoert");
-				//too Tall Regel
-				if((fromStack.getNumbofPieces()>=4 && fromStack.getNumbofPieces()-Integer.parseInt(move[1])<=4)  ||!board.getTallStack(nextPlayerString().charAt(0))) {
-					System.out.println("too Tall Regel");
+				//too Tall Regel? + stack owner?
+				if(fromStack.toString().charAt(0)==nextPlayerString().charAt(0)&&((fromStack.getNumbofPieces()>=4 && fromStack.getNumbofPieces()-Integer.parseInt(move[1])<=4)  ||!board.getTallStack(nextPlayerString().charAt(0)))) {
 					Zug zug = new Zug(Integer.parseInt(move[1]),new Position(move[0]));
-					System.out.println("destinations :");
-					zug.getPossibleDest().stream().forEach(System.out::println);
-						//falls zueg möglich
+						//move reicht um dest zu erreichen?
 						if(zug.getPossibleDest().contains(move[2])){
 						System.out.println("falls zueg möglich");
-						//Züg ausfuhren
+						//Züg ausfuhren & setLaststate & add to statistics
+						this.lastBoardstate = this.board.toString();
+						try {
 						this.board.movePieces(move[0],move[2],Integer.parseInt(move[1]));
+						}catch(IllegalArgumentException e) {return false;}
+						super.getHistory().add(new Move(moveString,this.lastBoardstate,player));
+						//winner?
+						if(board.isWinner(nextPlayerString().charAt(0))) {
+						setWinner(nextPlayerString());
+						finish(player);
+						
+						}
+						//draw?
+						else if(this.isRepeatingState()) {
+						super.draw = true;
+						finish(player);
+						
+						}
+						//set nextplayer
 						setNextPlayer((isRedNext())?bluePlayer:redPlayer);
 						return true;
 						}
-				}
-			}	
-		}			
+				}	
+					
 		return false;
 	}
 
+
+	/**check if the 
+	 * @return
+	 */
+	private boolean isRepeatingState() {
+	return super.getHistory().stream()
+				.map(m->m.getBoard())
+				.collect(Collectors.groupingBy(Function.identity(),Collectors.counting()))
+				.entrySet().stream().filter(e -> e.getValue() == 2)
+				.anyMatch(e -> this.board.toString().equals(e.getKey()));
+	}
 	/**checks the moveString's syntax
 	 * @param moveString
 	 * @return true if moveString sytax is correct, false otherwise
@@ -244,6 +274,16 @@ public class DeathStacksGame extends Game {
 			return false;
 		}
 		return true;
+	}
+	/**
+	 * @param p
+	 */
+	private void setWinner(String p) {
+		if(p=="r")
+			this.redPlayer.setWinner();
+		else 
+			this.bluePlayer.setWinner();
+
 	}
 
 }

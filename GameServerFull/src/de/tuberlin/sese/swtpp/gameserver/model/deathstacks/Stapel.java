@@ -27,14 +27,6 @@ public class Stapel implements Serializable {
 		this.position = position;
 	}
 
-	public Stapel(String data , String pos) {
-		this(data, new Position(pos));
-		
-	}
-	public Stapel(Position pos) {
-		this(null,pos);
-	}
-
 	/**********
 	 * GETTERS
 	 **********/
@@ -44,7 +36,7 @@ public class Stapel implements Serializable {
 	}
 	public char getOwner() {
 		if(this.data == null || this.data.length() == 0)
-		return 'n' ;
+		return 'n';
 		return this.data.charAt(0);
 	}
 	public int getNumbofPieces() {
@@ -78,7 +70,11 @@ public class Stapel implements Serializable {
 			throw new IllegalArgumentException("not enought pieces");
 		}
 		String removed = this.data.substring(0,x);
-		this.data = this.data.substring(x);
+		if(this.data.length()==x) {
+			this.data = null;
+		}
+		else {
+		this.data = this.data.substring(x);}
 		System.out.println("Remove piece are "+ removed);
 		return removed  ;
 		}

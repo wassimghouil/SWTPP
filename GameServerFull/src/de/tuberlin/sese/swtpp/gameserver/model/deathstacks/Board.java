@@ -3,6 +3,8 @@ import java.io.Serializable;
 import java.rmi.Remote;
 import java.util.*;
 import java.util.stream.Collectors;
+
+import de.tuberlin.sese.swtpp.gameserver.model.Player;
 /**
  * @author Ouassim
  *
@@ -22,23 +24,26 @@ public class Board implements Serializable {
 	 * Constructor
 	 **************/
 	public Board() {
-	String Stemp;	
-	LinkedList<Stapel> tempRow = null;
-	for (int y = 0; y < 6; y++) {
-		tempRow = new LinkedList<>();
-		for (int x = 0; x < 6; x++) {
-			if(y>0 && y<5) {
-			tempRow.add(new Stapel(new Position(x,y)));
-			}
-			else {
-			Stemp = (y==0)?"rr":"bb";
-			tempRow.add(new Stapel(Stemp, new Position(x, y)));
-			}
-		} 
-		this.positions.add(tempRow);
+
+		this.setBoard("rr,rr,rr,rr,rr,rr/,,,,,/,,,,,/,,,,,/,,,,,/bb,bb,bb,bb,bb,bb");
 	}
+	/******************
+	 * SETTER
+	 ******************/
+	public void setBoard(String state) {
+	LinkedList<LinkedList<Stapel>> result = new LinkedList<LinkedList<Stapel>>();
+	LinkedList<Stapel> rowrez = null;
+	String[] rows = state.split("/");
+	for (int j = 0; j < rows.length; j++) {
+		String[] stapeln = rows[j].split(",",-1);
+		rowrez = new LinkedList<Stapel>();
+		for (int i = 0; i < stapeln.length; i++) {
+		rowrez.add(new Stapel(stapeln[i],new Position(i,j)));	
+		}
+		result.add(rowrez);
 	}
-	
+	this.positions = result;
+	}
 	/**
 	 * @return board positions
 	 */
@@ -71,26 +76,38 @@ public class Board implements Serializable {
 	 */
 	public String toString() {
 		return this.positions.stream()
-				.map(l-> l.stream().map(stapel -> (stapel == null || stapel.toString() == null)?"":stapel.toString())
+				.map(l-> l.stream().map(stapel -> (stapel.toString() == null || stapel.toString().isEmpty())?"":stapel.toString())
 						.collect(Collectors.joining(",")))
 				.collect(Collectors.joining("/"));
 				}
 	
 	
-	/**create a stack at a specified position
-	 * @param input
-	 * @param pos
-	 */
-	private void createStapelAt(String input,Position pos) {
-	this.positions.get(pos.getY()).set(pos.getX(),new Stapel(input, pos));	
-	}
+
 	
 	/**check if is there a Tall stack
 	 * @param player
 	 * @return true if it exist a Tall stack,false otherwise
 	 */
 	public boolean getTallStack(char player) {
-		return this.positions.stream().anyMatch(row-> row.stream().anyMatch(stack -> stack.getOwner() == player && stack.getNumbofPieces()>= 4));
+		return this.positions.stream()
+				.anyMatch(row-> row
+						.stream()
+						.anyMatch(stack-> stack.getOwner() == player && stack.getNumbofPieces()>= 4));
 	}
+	public boolean isWinner(LinkedList<Stapel> input,char p) {
+		return input.stream().allMatch(l->l.getOwner() == 'n' || l.getOwner() == p);
+	}
+	public boolean isWinner(char p) {
+	
+		return this.positions.stream().allMatch(l->this.isWinner(l, p));
+				
+				
+			
+
+			
+	
+	}
+	
+	
 
 }
